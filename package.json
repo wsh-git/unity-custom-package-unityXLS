@@ -1,0 +1,20 @@
+{
+  "name": "com.wshunity.xls",
+  "displayName": "Wsh Unity XLS",
+  "version": "0.0.1",
+  "unity": "2017.2",
+  "keywords": [
+    "XLS"
+  ],
+  "description": "This is a very simple xls system.",
+  "repository": {
+    "url": "https://github.com/wsh-git/unity-custom-package-unityXLS.git",
+    "type": "git",
+    "revision": ""
+  },
+  "author": {
+    "name": "wshunity",
+    "email": "",
+    "url": ""
+  }
+}
