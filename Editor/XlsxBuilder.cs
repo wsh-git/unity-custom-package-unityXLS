@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
+using Codice.Client.BaseCommands.Fileinfo;
 using OfficeOpenXml;
 using UnityEditor;
 
@@ -7,14 +11,23 @@ namespace Wsh.Xlsx.Editor {
 
     public class XlsxBuilder {
 
-        public static void BuildFile(string fileName, string filePath, string outputFilePath) {
+        public static void BuildFile(string fileName, string filePath, string outputFilePath, ref Dictionary<string, int> idDic) {
             using(FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
                 using(var package = new ExcelPackage(fs)) {
                     // 获取第一个工作表
                     var worksheet = package.Workbook.Worksheets[0];
+
                     using(XlsxGenerateData xlsxGenerateData = new XlsxGenerateData(fileName, outputFilePath)) {
                         try {
                             xlsxGenerateData.Init(worksheet);
+                            var idDicTemp = xlsxGenerateData.GetIds();
+                            foreach(var key in idDicTemp.Keys) {
+                                if(idDic.ContainsKey(key)) {
+                                    throw new Exception($"Exist same key in '{filePath}' with other xlsx.");
+                                } else {
+                                    idDic.Add(key, idDicTemp[key]);
+                                }
+                            }
                         } catch(Exception e) {
                             throw e;
                         }
@@ -30,12 +43,13 @@ namespace Wsh.Xlsx.Editor {
 
         public static void BuildFolder(string xlsxFolder, string outputFolder) {
             DirectoryInfo dir = new DirectoryInfo(xlsxFolder);
-            FileInfo[] fileInfos = dir.GetFiles();
+            System.IO.FileInfo[] fileInfos = dir.GetFiles();
             EditorUtility.DisplayProgressBar("Generate xlsx Csharp file", "start generate...", 0);
             int currentIndex = 0;
             float totalNumber = fileInfos.Length;
+            Dictionary<string, int> idDic = new Dictionary<string, int>();
             try {
-                foreach(FileInfo fileInfo in fileInfos) {
+                foreach(System.IO.FileInfo fileInfo in fileInfos) {
                     string filePath = fileInfo.FullName;
                     string fileName = Path.GetFileNameWithoutExtension(fileInfo.Name);
                     string extension = fileInfo.Extension;
@@ -49,8 +63,10 @@ namespace Wsh.Xlsx.Editor {
                         Log.Error("Dont support '.xls'. Please use '.xlsx'");
                         continue;
                     }
-                    BuildFile(fileName, filePath, Path.Combine(outputFolder, fileName + XlsxDefine.CLASS_SUFFIX + ".cs"));
+                    BuildFile(fileName, filePath, Path.Combine(outputFolder, fileName + XlsxDefine.CLASS_SUFFIX + ".cs"), ref idDic);
                 }
+                EditorUtility.DisplayProgressBar("Generate xlsx Csharp file", "generate " + XlsxDefine.XLSX_ID_FILE_NAME, 0);
+                XlsxClassGenerator.GenerateXlsxIdListFile(idDic, outputFolder);
                 EditorUtility.ClearProgressBar();
                 EditorUtility.DisplayDialog("Generate xlsx", "Generate Success", "Ok");
             } catch(Exception e) {
@@ -58,7 +74,6 @@ namespace Wsh.Xlsx.Editor {
                 EditorUtility.DisplayDialog("Generate xlsx", "Generate Failed", "Ok");
                 throw e;
             }
-
             AssetDatabase.Refresh();
         }
 

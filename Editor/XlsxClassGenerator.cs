@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Linq;
+using UnityEditor;
 
 namespace Wsh.Xlsx.Editor {
 
@@ -12,6 +14,7 @@ namespace Wsh.Xlsx.Editor {
             if(XlsxDefine.TAB_CHAR_ARRAY.Length <= tabIndex ) {
                 Log.Error("XlsxDefine.TAB_CHAR_ARRAY outside the bounds of array.", tabIndex);
             }
+            
             stringBuilder.Append(XlsxDefine.TAB_CHAR_ARRAY[tabIndex]);
         }
 
@@ -20,11 +23,34 @@ namespace Wsh.Xlsx.Editor {
             if(tabIndex <= 0) {
                 Log.Error("XlsxDefine.TAB_CHAR_ARRAY index: 0.");
             }
+            
             stringBuilder.Append(XlsxDefine.TAB_CHAR_ARRAY[tabIndex]);
         }
 
         private static void KeepTap(StringBuilder stringBuilder, ref int tabIndex) {
             stringBuilder.Append(XlsxDefine.TAB_CHAR_ARRAY[tabIndex]);
+        }
+        
+        public static void GenerateXlsxIdListFile(Dictionary<string, int> idDic, string outputFolder) {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.Append("// Automatically generated. Do not modify it manually!!!\n\n");
+            stringBuilder.Append("namespace Wsh.Xlsx {\n\n");
+            int tabIndex = 0;
+            AddTab(stringBuilder, ref tabIndex);
+            stringBuilder.Append($"public static class {XlsxDefine.XLSX_ID_CLASS_NAME} " + "{\n");
+            List<string> list = idDic.Keys.ToList();
+            list.Sort();
+            tabIndex++;
+            for(int i = 0; i < list.Count; i++) {
+                KeepTap(stringBuilder, ref tabIndex);
+                stringBuilder.AppendLine($"public const int {list[i]} = {idDic[list[i]]};");
+            }
+            SubTab(stringBuilder, ref tabIndex);
+            stringBuilder.AppendLine("}");
+            stringBuilder.AppendLine("}");
+            string outputFilePath = Path.Combine(outputFolder, XlsxDefine.XLSX_ID_FILE_NAME);
+            File.WriteAllText(outputFilePath, stringBuilder.ToString());
+            Log.Info($"{outputFilePath}{XlsxDefine.CLASS_SUFFIX}.cs generate success.");
         }
 
         public static void Generate(XlsxGenerateData xlsxGenerateData) {

@@ -26,5 +26,11 @@ namespace Wsh.Xlsx.Editor {
 
         public const string XLS_EXTENSION = ".xls";
         public const string XLSX_EXTENSION = ".xlsx";
+
+        public const string XLSX_ID_CLASS_NAME = "XlsxId";
+        public const string XLSX_ID_FILE_NAME = XLSX_ID_CLASS_NAME + ".cs";
+
+        public const string LOCAL_ID_CLASS_NAME = "LocalId";
+        public const string LOCAL_ID_FILE_NAME = LOCAL_ID_CLASS_NAME + ".cs";
     }
 }

@@ -123,6 +123,14 @@ namespace Wsh.Xlsx.Editor {
             }
         }
 
+        public Dictionary<string, int> GetIds() {
+            Dictionary<string, int> dic = new Dictionary<string, int>();
+            foreach(var value in  m_idInfoDic.Values) {
+                dic.Add(value.Id, value.Value);
+            }
+            return dic;
+        }
+
         private void SetValues(ExcelWorksheet worksheet) {
             // 读取数据行
             // Log.Info("Row", worksheet.Dimension.End.Row, "Column", worksheet.Dimension.End.Column, totalColumnNumber, "Cells.Rows", worksheet.Cells.Rows, "Cells.Columns", worksheet.Cells.Columns);
