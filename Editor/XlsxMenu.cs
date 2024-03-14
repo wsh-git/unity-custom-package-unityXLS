@@ -9,8 +9,6 @@ namespace Wsh.Xlsx.Editor {
             XlsxBuilderWindow.ShowWindow();
         }
 
-        
-
     }
 
 }

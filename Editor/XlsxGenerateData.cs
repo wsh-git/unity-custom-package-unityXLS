@@ -1,4 +1,4 @@
-using OfficeOpenXml;
+ï»¿using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 
@@ -12,9 +12,9 @@ namespace Wsh.Xlsx.Editor {
         public string XlsxName => m_xlsxName;
         public string OutputFilePath => m_outputFilePath;
 
-        //ÒÔÁĞÎªkey
+        //ä»¥åˆ—ä¸ºkey
         private Dictionary<int, XlsxHeadInfo> m_headInfoDic;
-        //ÒÔ VALUE(int) Îªkey
+        //ä»¥ VALUE(int) ä¸ºkey
         private Dictionary<int, XlsxIDInfo> m_idInfoDic;
         private string m_xlsxName;
         private string m_outputFilePath;
@@ -47,9 +47,9 @@ namespace Wsh.Xlsx.Editor {
         }
 
         private void SetHeadInfoDic(ExcelWorksheet worksheet, ref int idColIndex, ref int valueColIndex) {
-            //ÒÔÃû³ÆÎªkey
+            //ä»¥åç§°ä¸ºkey
             Dictionary<string, int> nameDic = new Dictionary<string, int>();
-            // ¶ÁÈ¡ÁĞÃû£¬
+            // è¯»å–åˆ—åï¼Œ
             for(int i = 1; i <= worksheet.Dimension.End.Column; i++) {
                 string headText = worksheet.Cells[1, i].Value.ToString();
                 string[] headData = headText.Split(':');
@@ -84,7 +84,7 @@ namespace Wsh.Xlsx.Editor {
         }
 
         private void SetIDInfoDic(ExcelWorksheet worksheet, int idColIndex, int valueColIndex) {
-            //ÒÔ ID(string) Îªkey
+            //ä»¥ ID(string) ä¸ºkey
             Dictionary<string, int> idDic = new Dictionary<string, int>();
             int idHeight = 0;
             int lastVauleId = 0;
@@ -132,7 +132,7 @@ namespace Wsh.Xlsx.Editor {
         }
 
         private void SetValues(ExcelWorksheet worksheet) {
-            // ¶ÁÈ¡Êı¾İĞĞ
+            // è¯»å–æ•°æ®è¡Œ
             // Log.Info("Row", worksheet.Dimension.End.Row, "Column", worksheet.Dimension.End.Column, totalColumnNumber, "Cells.Rows", worksheet.Cells.Rows, "Cells.Columns", worksheet.Cells.Columns);
             m_content = new object[worksheet.Dimension.End.Row + 1, worksheet.Dimension.End.Column + 1];
             for(int rowNum = 1; rowNum <= worksheet.Dimension.End.Row; rowNum++) {

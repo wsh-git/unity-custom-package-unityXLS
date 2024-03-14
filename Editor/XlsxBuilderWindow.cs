@@ -1,4 +1,4 @@
-using System.Security.Principal;
+锘縰sing System.Security.Principal;
 using UnityEditor;
 using UnityEngine;
 
@@ -65,8 +65,8 @@ namespace Wsh.Xlsx.Editor {
             } else {
                 GUILayout.Label(m_xlsxDir);
             }
-            if(GUILayout.Button("浏览")) {
-                string path = EditorUtility.OpenFolderPanel("选择项目Xlsx路径", Application.dataPath, "");
+            if(GUILayout.Button("娴忚")) {
+                string path = EditorUtility.OpenFolderPanel("閫夋嫨椤圭洰Xlsx璺緞", Application.dataPath, "");
                 if(path != null) {
                     m_xlsxDir = path;
                 }
@@ -83,8 +83,8 @@ namespace Wsh.Xlsx.Editor {
             } else {
                 GUILayout.Label(m_xlsxDataOutputDir);
             }
-            if(GUILayout.Button("浏览")) {
-                string path = EditorUtility.OpenFolderPanel("选择Xlsx数据导出路径", Application.dataPath, "");
+            if(GUILayout.Button("娴忚")) {
+                string path = EditorUtility.OpenFolderPanel("閫夋嫨Xlsx鏁版嵁瀵煎嚭璺緞", Application.dataPath, "");
                 if(path != null) {
                     m_xlsxDataOutputDir = path;
                 }

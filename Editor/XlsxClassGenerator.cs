@@ -1,14 +1,21 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Linq;
-using UnityEditor;
 
 namespace Wsh.Xlsx.Editor {
 
     public static class XlsxClassGenerator {
 
+        private static void SaveCsharpScript(string filePath, string content) {
+            using(FileStream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write)) {
+                using(StreamWriter streamWriter = new StreamWriter(fileStream, Encoding.UTF8)) {
+                    streamWriter.Write(content);
+                }
+            }
+        }
+        
         private static void AddTab(StringBuilder stringBuilder, ref int tabIndex) {
             tabIndex++;
             if(XlsxDefine.TAB_CHAR_ARRAY.Length <= tabIndex ) {
@@ -32,12 +39,20 @@ namespace Wsh.Xlsx.Editor {
         }
         
         public static void GenerateXlsxIdListFile(Dictionary<string, int> idDic, string outputFolder) {
+            GenerateIdsFile(idDic, XlsxDefine.XLSX_ID_CLASS_NAME, Path.Combine(outputFolder, XlsxDefine.XLSX_ID_FILE_NAME));
+        }
+
+        public static void GenerateLocalization(Dictionary<string, int> idDic, string outputFolder) {
+            GenerateIdsFile(idDic, XlsxDefine.LOCAL_ID_CLASS_NAME, Path.Combine(outputFolder, XlsxDefine.LOCAL_ID_FILE_NAME));
+        }
+
+        private static void GenerateIdsFile(Dictionary<string, int> idDic, string className, string outputFilePath) {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.Append("// Automatically generated. Do not modify it manually!!!\n\n");
             stringBuilder.Append("namespace Wsh.Xlsx {\n\n");
             int tabIndex = 0;
             AddTab(stringBuilder, ref tabIndex);
-            stringBuilder.Append($"public static class {XlsxDefine.XLSX_ID_CLASS_NAME} " + "{\n");
+            stringBuilder.Append($"public static class {className} " + "{\n");
             List<string> list = idDic.Keys.ToList();
             list.Sort();
             tabIndex++;
@@ -48,9 +63,9 @@ namespace Wsh.Xlsx.Editor {
             SubTab(stringBuilder, ref tabIndex);
             stringBuilder.AppendLine("}");
             stringBuilder.AppendLine("}");
-            string outputFilePath = Path.Combine(outputFolder, XlsxDefine.XLSX_ID_FILE_NAME);
-            File.WriteAllText(outputFilePath, stringBuilder.ToString());
-            Log.Info($"{outputFilePath}{XlsxDefine.CLASS_SUFFIX}.cs generate success.");
+            //File.WriteAllText(outputFilePath, stringBuilder.ToString());
+            SaveCsharpScript(outputFilePath, stringBuilder.ToString());
+            Log.Info($"{outputFilePath} generate success.");
         }
 
         public static void Generate(XlsxGenerateData xlsxGenerateData) {
@@ -69,7 +84,8 @@ namespace Wsh.Xlsx.Editor {
                 stringBuilder.Append(CreateFunctions(xlsxGenerateData.HeadInfoDic, structName, ref tabIndex));
                 stringBuilder.Append(XlsxDefine.TAB_CHAR_ARRAY[1] + "}\n\n");
                 stringBuilder.Append("}\n");
-                File.WriteAllText(xlsxGenerateData.OutputFilePath, stringBuilder.ToString());
+                //File.WriteAllText(xlsxGenerateData.OutputFilePath, stringBuilder.ToString());
+                SaveCsharpScript(xlsxGenerateData.OutputFilePath, stringBuilder.ToString());
                 Log.Info($"{xlsxGenerateData.XlsxName}{XlsxDefine.CLASS_SUFFIX}.cs generate success.");
             } catch(Exception e) {
                 throw e;

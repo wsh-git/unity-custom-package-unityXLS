@@ -11,22 +11,26 @@ namespace Wsh.Xlsx.Editor {
 
     public class XlsxBuilder {
 
-        public static void BuildFile(string fileName, string filePath, string outputFilePath, ref Dictionary<string, int> idDic) {
+        public static void BuildFile(string fileName, string filePath, string outputFolder, ref Dictionary<string, int> idDic) {
             using(FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
                 using(var package = new ExcelPackage(fs)) {
                     // 获取第一个工作表
                     var worksheet = package.Workbook.Worksheets[0];
-
+                    string outputFilePath = Path.Combine(outputFolder, fileName + XlsxDefine.CLASS_SUFFIX + ".cs");
                     using(XlsxGenerateData xlsxGenerateData = new XlsxGenerateData(fileName, outputFilePath)) {
                         try {
                             xlsxGenerateData.Init(worksheet);
-                            var idDicTemp = xlsxGenerateData.GetIds();
-                            foreach(var key in idDicTemp.Keys) {
-                                if(idDic.ContainsKey(key)) {
-                                    throw new Exception($"Exist same key in '{filePath}' with other xlsx.");
-                                } else {
-                                    idDic.Add(key, idDicTemp[key]);
+                            if(fileName != XlsxDefine.LOCAL_FILE_NAME) {
+                                var idDicTemp = xlsxGenerateData.GetIds();
+                                foreach(var key in idDicTemp.Keys) {
+                                    if(idDic.ContainsKey(key)) {
+                                        throw new Exception($"Exist same key in '{filePath}' with other xlsx.");
+                                    } else {
+                                        idDic.Add(key, idDicTemp[key]);
+                                    }
                                 }
+                            } else {
+                                XlsxClassGenerator.GenerateLocalization(xlsxGenerateData.GetIds(), outputFolder);
                             }
                         } catch(Exception e) {
                             throw e;
@@ -63,7 +67,7 @@ namespace Wsh.Xlsx.Editor {
                         Log.Error("Dont support '.xls'. Please use '.xlsx'");
                         continue;
                     }
-                    BuildFile(fileName, filePath, Path.Combine(outputFolder, fileName + XlsxDefine.CLASS_SUFFIX + ".cs"), ref idDic);
+                    BuildFile(fileName, filePath, outputFolder, ref idDic);
                 }
                 EditorUtility.DisplayProgressBar("Generate xlsx Csharp file", "generate " + XlsxDefine.XLSX_ID_FILE_NAME, 0);
                 XlsxClassGenerator.GenerateXlsxIdListFile(idDic, outputFolder);

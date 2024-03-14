@@ -1,4 +1,4 @@
-namespace Wsh.Xlsx.Editor {
+﻿namespace Wsh.Xlsx.Editor {
 
     public static class XlsxDefine {
 
@@ -30,6 +30,7 @@ namespace Wsh.Xlsx.Editor {
         public const string XLSX_ID_CLASS_NAME = "XlsxId";
         public const string XLSX_ID_FILE_NAME = XLSX_ID_CLASS_NAME + ".cs";
 
+        public const string LOCAL_FILE_NAME = "Localization";
         public const string LOCAL_ID_CLASS_NAME = "LocalId";
         public const string LOCAL_ID_FILE_NAME = LOCAL_ID_CLASS_NAME + ".cs";
     }
