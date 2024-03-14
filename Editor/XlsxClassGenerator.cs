@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
-using OfficeOpenXml;
 
 namespace Wsh.Xlsx.Editor {
 
@@ -28,7 +27,7 @@ namespace Wsh.Xlsx.Editor {
             stringBuilder.Append(XlsxDefine.TAB_CHAR_ARRAY[tabIndex]);
         }
 
-        public static void Generate(XlsxGenerateData xlsxGenerateData, ExcelWorksheet worksheet) {
+        public static void Generate(XlsxGenerateData xlsxGenerateData) {
             try {
                 StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.Append("// Automatically generated. Do not modify it manually!!!\n\n");
@@ -40,7 +39,7 @@ namespace Wsh.Xlsx.Editor {
                 stringBuilder.Append($"public static class {xlsxGenerateData.XlsxName}{XlsxDefine.CLASS_SUFFIX} " + "{\n\n");
                 string structName = xlsxGenerateData.XlsxName + XlsxDefine.STRUCT_SUFFIX;
                 stringBuilder.Append(CreateStruct(structName, xlsxGenerateData.HeadInfoDic, ref tabIndex));
-                stringBuilder.Append(CreateDictionary(xlsxGenerateData.HeadInfoDic, xlsxGenerateData.IdInfoDic, worksheet, structName, ref tabIndex));
+                stringBuilder.Append(CreateDictionary(xlsxGenerateData, structName, ref tabIndex));
                 stringBuilder.Append(CreateFunctions(xlsxGenerateData.HeadInfoDic, structName, ref tabIndex));
                 stringBuilder.Append(XlsxDefine.TAB_CHAR_ARRAY[1] + "}\n\n");
                 stringBuilder.Append("}\n");
@@ -65,19 +64,19 @@ namespace Wsh.Xlsx.Editor {
             return stringBuilder.ToString();
         }
 
-        private static string CreateDictionary(Dictionary<int, XlsxHeadInfo> headInfoDic, Dictionary<int, XlsxIDInfo> idInfoDic, ExcelWorksheet worksheet, string structName, ref int tabIndex) {
+        private static string CreateDictionary(XlsxGenerateData xlsxGenerateData, string structName, ref int tabIndex) {
             try {
                 StringBuilder stringBuilder = new StringBuilder();
                 KeepTap(stringBuilder, ref tabIndex);
                 stringBuilder.Append($"private readonly static Dictionary<int, {structName}> m_dic = new Dictionary<int, {structName}> " + "{\n");
                 tabIndex++;
-                foreach(var value in idInfoDic.Values) {
+                foreach(var value in xlsxGenerateData.IdInfoDic.Values) {
                     KeepTap(stringBuilder, ref tabIndex);
                     stringBuilder.AppendLine("{" + $" {value.Value}, new {structName} " + "{");
                     tabIndex++;
-                    foreach(var headInfo in headInfoDic.Values) {
+                    foreach(var headInfo in xlsxGenerateData.HeadInfoDic.Values) {
                         KeepTap(stringBuilder, ref tabIndex);
-                        stringBuilder.AppendLine($"{headInfo.Name} = {GetValue(value, headInfo, worksheet, ref tabIndex)},");
+                        stringBuilder.AppendLine($"{headInfo.Name} = {GetValue(value, headInfo, xlsxGenerateData.Content, ref tabIndex)},");
                     }
                     SubTab(stringBuilder, ref tabIndex);
                     stringBuilder.AppendLine("}},");
@@ -90,87 +89,89 @@ namespace Wsh.Xlsx.Editor {
             }
         }
 
-        private static string GetValue(XlsxIDInfo idInfo, XlsxHeadInfo headInfo, ExcelWorksheet worksheet, ref int tabIndex) {
+        private static string GetValue(XlsxIDInfo idInfo, XlsxHeadInfo headInfo, object[,] content, ref int tabIndex) {
             try {
-                object obj = worksheet.Cells[idInfo.RowIndex, headInfo.Index].Value;
+                object obj = content[idInfo.RowIndex, headInfo.Index];
                 switch(headInfo.ValueType) {
                     case XlsxFieldType.STRING:
                         return TryConvertString(obj);
                     case XlsxFieldType.STRING_ARRAY:
-                        return TryConvertStringArray(idInfo.RowIndex, headInfo.Index, worksheet, idInfo.Height, ref tabIndex);
+                        return TryConvertStringArray(idInfo.RowIndex, headInfo.Index, content, idInfo.Height, ref tabIndex);
                     case XlsxFieldType.STRING_2D_ARRAY:
-                        return TryConvertString2DArray(idInfo.RowIndex, headInfo.Index, worksheet, idInfo.Height, ref tabIndex);;
+                        return TryConvertString2DArray(idInfo.RowIndex, headInfo.Index, content, idInfo.Height, ref tabIndex);;
                     case XlsxFieldType.INT:
                         return TryConvertInt(obj);
                     case XlsxFieldType.INT_ARRAY:
-                        return TryConvertIntArray(idInfo.RowIndex, headInfo.Index, worksheet, idInfo.Height, ref tabIndex);
+                        return TryConvertIntArray(idInfo.RowIndex, headInfo.Index, content, idInfo.Height, ref tabIndex);
                     case XlsxFieldType.INT_2D_ARRAY:
-                        return TryConvertInt2DArray(idInfo.RowIndex, headInfo.Index, worksheet, idInfo.Height, ref tabIndex);
+                        return TryConvertInt2DArray(idInfo.RowIndex, headInfo.Index, content, idInfo.Height, ref tabIndex);
                     case XlsxFieldType.INT_TEN:
                         return TryConvertIntTen(obj);
                     case XlsxFieldType.INT_TEN_ARRAY:
-                        return TryConvertIntTenArray(idInfo.RowIndex, headInfo.Index, worksheet, idInfo.Height, ref tabIndex);
+                        return TryConvertIntTenArray(idInfo.RowIndex, headInfo.Index, content, idInfo.Height, ref tabIndex);
                     case XlsxFieldType.INT_TEN_2D_ARRAY:
-                        return TryConvertIntTen2DArray(idInfo.RowIndex, headInfo.Index, worksheet, idInfo.Height, ref tabIndex);
+                        return TryConvertIntTen2DArray(idInfo.RowIndex, headInfo.Index, content, idInfo.Height, ref tabIndex);
                     case XlsxFieldType.INT_HUNDRED:
                         return TryConvertIntHundred(obj);
                     case XlsxFieldType.INT_HUNDRED_ARRAY:
-                        return TryConvertIntHundredArray(idInfo.RowIndex, headInfo.Index, worksheet, idInfo.Height, ref tabIndex);
+                        return TryConvertIntHundredArray(idInfo.RowIndex, headInfo.Index, content, idInfo.Height, ref tabIndex);
                     case XlsxFieldType.INT_HUNDRED_2D_ARRAY:
-                        return TryConvertIntHundred2DArray(idInfo.RowIndex, headInfo.Index, worksheet, idInfo.Height, ref tabIndex);
+                        return TryConvertIntHundred2DArray(idInfo.RowIndex, headInfo.Index, content, idInfo.Height, ref tabIndex);
                     case XlsxFieldType.INT_THOUSAND:
                         return TryConvertIntThousand(obj);
                     case XlsxFieldType.INT_THOUSAND_ARRAY:
-                        return TryConvertIntThousandArray(idInfo.RowIndex, headInfo.Index, worksheet, idInfo.Height, ref tabIndex);
+                        return TryConvertIntThousandArray(idInfo.RowIndex, headInfo.Index, content, idInfo.Height, ref tabIndex);
                     case XlsxFieldType.INT_THOUSAND_2D_ARRAY:
-                        return TryConvertIntThousand2DArray(idInfo.RowIndex, headInfo.Index, worksheet, idInfo.Height, ref tabIndex);
+                        return TryConvertIntThousand2DArray(idInfo.RowIndex, headInfo.Index, content, idInfo.Height, ref tabIndex);
                     case XlsxFieldType.BOOLEAN:
                         return TryConvertBoolean(obj);
                     case XlsxFieldType.BOOLEAN_ARRAY:
-                        return TryConvertBooleanArray(idInfo.RowIndex, headInfo.Index, worksheet, idInfo.Height, ref tabIndex);
+                        return TryConvertBooleanArray(idInfo.RowIndex, headInfo.Index, content, idInfo.Height, ref tabIndex);
                     case XlsxFieldType.BOOLEAN_2D_ARRAY:
-                        return TryConvertBoolean2DArray(idInfo.RowIndex, headInfo.Index, worksheet, idInfo.Height, ref tabIndex);
+                        return TryConvertBoolean2DArray(idInfo.RowIndex, headInfo.Index, content, idInfo.Height, ref tabIndex);
                 }
                 return "null";
             } catch(Exception e) {
                 throw new Exception(e.Message + $" in ({idInfo.RowIndex}, {headInfo.Index}). ");
             }
         }
-        private static string TryConvertIntTenArray(int rowIndex, int colIndex, ExcelWorksheet worksheet, int maxHeight, ref int tabIndex) {
-            return TryConvertArray(rowIndex, colIndex, worksheet, maxHeight, XlsxFieldType.FLOAT_ARRAY, ref tabIndex, TryConvertIntTen);
+
+        private static string TryConvertIntTenArray(int rowIndex, int colIndex, object[,] content, int maxHeight, ref int tabIndex) {
+            return TryConvertArray(rowIndex, colIndex, content, maxHeight, XlsxFieldType.FLOAT_ARRAY, ref tabIndex, TryConvertIntTen);
         }
-        private static string TryConvertIntHundredArray(int rowIndex, int colIndex, ExcelWorksheet worksheet, int maxHeight, ref int tabIndex) {
-            return TryConvertArray(rowIndex, colIndex, worksheet, maxHeight, XlsxFieldType.FLOAT_ARRAY, ref tabIndex, TryConvertIntHundred);
+        
+        private static string TryConvertIntHundredArray(int rowIndex, int colIndex, object[,] content, int maxHeight, ref int tabIndex) {
+            return TryConvertArray(rowIndex, colIndex, content, maxHeight, XlsxFieldType.FLOAT_ARRAY, ref tabIndex, TryConvertIntHundred);
         }
 
-        private static string TryConvertIntThousandArray(int rowIndex, int colIndex, ExcelWorksheet worksheet, int maxHeight, ref int tabIndex) {
-            return TryConvertArray(rowIndex, colIndex, worksheet, maxHeight, XlsxFieldType.FLOAT_ARRAY, ref tabIndex, TryConvertIntThousand);
+        private static string TryConvertIntThousandArray(int rowIndex, int colIndex, object[,] content, int maxHeight, ref int tabIndex) {
+            return TryConvertArray(rowIndex, colIndex, content, maxHeight, XlsxFieldType.FLOAT_ARRAY, ref tabIndex, TryConvertIntThousand);
         }
 
-        private static string TryConvertStringArray(int rowIndex, int colIndex, ExcelWorksheet worksheet, int maxHeight, ref int tabIndex) {
-            return TryConvertArray(rowIndex, colIndex, worksheet, maxHeight, XlsxFieldType.STRING_ARRAY, ref tabIndex, TryConvertString);
+        private static string TryConvertStringArray(int rowIndex, int colIndex, object[,] content, int maxHeight, ref int tabIndex) {
+            return TryConvertArray(rowIndex, colIndex, content, maxHeight, XlsxFieldType.STRING_ARRAY, ref tabIndex, TryConvertString);
         }
 
-        private static string TryConvertIntArray(int rowIndex, int colIndex, ExcelWorksheet worksheet, int maxHeight, ref int tabIndex) {
-            return TryConvertArray(rowIndex, colIndex, worksheet, maxHeight, XlsxFieldType.INT_ARRAY, ref tabIndex, TryConvertInt);
+        private static string TryConvertIntArray(int rowIndex, int colIndex, object[,] content, int maxHeight, ref int tabIndex) {
+            return TryConvertArray(rowIndex, colIndex, content, maxHeight, XlsxFieldType.INT_ARRAY, ref tabIndex, TryConvertInt);
         }
 
-        private static string TryConvertBooleanArray(int rowIndex, int colIndex, ExcelWorksheet worksheet, int maxHeight, ref int tabIndex) {
-            return TryConvertArray(rowIndex, colIndex, worksheet, maxHeight, XlsxFieldType.BOOLEAN_ARRAY, ref tabIndex, TryConvertBoolean);
+        private static string TryConvertBooleanArray(int rowIndex, int colIndex, object[,] content, int maxHeight, ref int tabIndex) {
+            return TryConvertArray(rowIndex, colIndex, content, maxHeight, XlsxFieldType.BOOLEAN_ARRAY, ref tabIndex, TryConvertBoolean);
         }
 
-        private static string TryConvertArray(int rowIndex, int colIndex, ExcelWorksheet worksheet, int maxHeight, string valueType, ref int tabIndex, Func<object, string> tryConvertHandler) {
+        private static string TryConvertArray(int rowIndex, int colIndex, object[,] content, int maxHeight, string valueType, ref int tabIndex, Func<object, string> tryConvertHandler) {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.AppendLine($"new {valueType} " + "{");
             bool hasContent = false;
             tabIndex++;
             for(int row = rowIndex; row < rowIndex+maxHeight; row++) {
-                if(worksheet.Cells[row, colIndex].Value == null) {
+                if(content[row, colIndex] == null) {
                     break;
                 }
                 hasContent = true;
                 KeepTap(stringBuilder, ref tabIndex);
-                stringBuilder.Append(tryConvertHandler(worksheet.Cells[row, colIndex].Value));
+                stringBuilder.Append(tryConvertHandler(content[row, colIndex]));
                 stringBuilder.AppendLine(",");
             }
             SubTab(stringBuilder, ref tabIndex);
@@ -181,42 +182,43 @@ namespace Wsh.Xlsx.Editor {
             return "null";
         }
 
-        private static string TryConvertString2DArray(int rowIndex, int colIndex, ExcelWorksheet worksheet, int maxHeight, ref int tabIndex) {
-            return TryConvert2DArray(rowIndex, colIndex, worksheet, maxHeight, XlsxFieldType.STRING, ref tabIndex, TryConvertString);
+        private static string TryConvertString2DArray(int rowIndex, int colIndex, object[,] content, int maxHeight, ref int tabIndex) {
+            return TryConvert2DArray(rowIndex, colIndex, content, maxHeight, XlsxFieldType.STRING, ref tabIndex, TryConvertString);
         }
         
-        private static string TryConvertInt2DArray(int rowIndex, int colIndex, ExcelWorksheet worksheet, int maxHeight, ref int tabIndex) {
-            return TryConvert2DArray(rowIndex, colIndex, worksheet, maxHeight, XlsxFieldType.INT, ref tabIndex, TryConvertInt);
-        }
-        private static string TryConvertIntTen2DArray(int rowIndex, int colIndex, ExcelWorksheet worksheet, int maxHeight, ref int tabIndex) {
-            return TryConvert2DArray(rowIndex, colIndex, worksheet, maxHeight, XlsxFieldType.FLOAT, ref tabIndex, TryConvertIntTen);
+        private static string TryConvertInt2DArray(int rowIndex, int colIndex, object[,] content, int maxHeight, ref int tabIndex) {
+            return TryConvert2DArray(rowIndex, colIndex, content, maxHeight, XlsxFieldType.INT, ref tabIndex, TryConvertInt);
         }
 
-        private static string TryConvertIntHundred2DArray(int rowIndex, int colIndex, ExcelWorksheet worksheet, int maxHeight, ref int tabIndex) {
-            return TryConvert2DArray(rowIndex, colIndex, worksheet, maxHeight, XlsxFieldType.FLOAT, ref tabIndex, TryConvertIntHundred);
+        private static string TryConvertIntTen2DArray(int rowIndex, int colIndex, object[,] content, int maxHeight, ref int tabIndex) {
+            return TryConvert2DArray(rowIndex, colIndex, content, maxHeight, XlsxFieldType.FLOAT, ref tabIndex, TryConvertIntTen);
         }
 
-        private static string TryConvertIntThousand2DArray(int rowIndex, int colIndex, ExcelWorksheet worksheet, int maxHeight, ref int tabIndex) {
-            return TryConvert2DArray(rowIndex, colIndex, worksheet, maxHeight, XlsxFieldType.FLOAT, ref tabIndex, TryConvertIntThousand);
+        private static string TryConvertIntHundred2DArray(int rowIndex, int colIndex, object[,] content, int maxHeight, ref int tabIndex) {
+            return TryConvert2DArray(rowIndex, colIndex, content, maxHeight, XlsxFieldType.FLOAT, ref tabIndex, TryConvertIntHundred);
         }
 
-        private static string TryConvertBoolean2DArray(int rowIndex, int colIndex, ExcelWorksheet worksheet, int maxHeight, ref int tabIndex) {
-            return TryConvert2DArray(rowIndex, colIndex, worksheet, maxHeight, XlsxFieldType.BOOLEAN, ref tabIndex, TryConvertBoolean);
+        private static string TryConvertIntThousand2DArray(int rowIndex, int colIndex, object[,] content, int maxHeight, ref int tabIndex) {
+            return TryConvert2DArray(rowIndex, colIndex, content, maxHeight, XlsxFieldType.FLOAT, ref tabIndex, TryConvertIntThousand);
+        }
+
+        private static string TryConvertBoolean2DArray(int rowIndex, int colIndex, object[,] content, int maxHeight, ref int tabIndex) {
+            return TryConvert2DArray(rowIndex, colIndex, content, maxHeight, XlsxFieldType.BOOLEAN, ref tabIndex, TryConvertBoolean);
         }
         
-        private static string TryConvert2DArray(int rowIndex, int colIndex, ExcelWorksheet worksheet, int maxHeight, string valueType, ref int tabIndex, Func<object, string> tryConvertHandler) {
+        private static string TryConvert2DArray(int rowIndex, int colIndex, object[,] content, int maxHeight, string valueType, ref int tabIndex, Func<object, string> tryConvertHandler) {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.AppendLine($"new {valueType}[][] " + "{");
             bool hasContent = false;
             tabIndex++;
             for(int row = rowIndex; row < rowIndex + maxHeight; row++) {
-                if(worksheet.Cells[row, colIndex].Value == null) {
+                if(content[row, colIndex] == null) {
                     break;
                 }
                 hasContent = true;
                 KeepTap(stringBuilder, ref tabIndex);
                 stringBuilder.AppendLine($"new {valueType}[] " + "{");
-                string text = worksheet.Cells[row, colIndex].Value.ToString();
+                string text = content[row, colIndex].ToString();
                 string[] arrayText = text.Split('#');
                 tabIndex++;
                 for(int i = 0; i < arrayText.Length; i++) {

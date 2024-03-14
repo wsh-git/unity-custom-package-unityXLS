@@ -19,7 +19,7 @@ namespace Wsh.Xlsx.Editor {
                             throw e;
                         }
                         try {
-                            XlsxClassGenerator.Generate(xlsxGenerateData, worksheet);
+                            XlsxClassGenerator.Generate(xlsxGenerateData);
                         } catch(Exception e) {
                             throw new Exception(e.Message + " from " + filePath);
                         }
