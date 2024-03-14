@@ -20,6 +20,12 @@
             return "{Index: " + Index + " Name: " + Name + " ValueType: " + ValueType + "}";
         }
 
+        public void Dispose() {
+            m_index = 0;
+            m_name = null;
+            m_valueType= null;
+        }
+
     }
 
 }

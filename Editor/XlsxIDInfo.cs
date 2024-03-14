@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Wsh.Xlsx.Editor {
+﻿namespace Wsh.Xlsx.Editor {
 
     public class XlsxIDInfo {
 
@@ -27,6 +25,13 @@ namespace Wsh.Xlsx.Editor {
     
         public override string ToString() {
             return "{Id: " + Id + " Value: " + Value + " RowIndex: " + RowIndex + " Height: " + Height + "}";
+        }
+
+        public void Dispose() {
+            m_id = null;
+            m_value = 0;
+            m_rowIndex = 0;
+            m_height = 0;
         }
 
     }
