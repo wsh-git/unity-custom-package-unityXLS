@@ -28,6 +28,8 @@ https://www.nuget.org/packages/EPPlus#dependencies-body-tab
 
 | ID              | VALUE | Name:string |
 | --------------- | ----- | ----------- |
-| TEST_NUMBER_001 |       |             |
+| TEST_NUMBER_001 | 1     | LiLei       |
 
 每张表格必须包含`ID`、`VALUE`两个字段，必须为全大写，后面的定义属性的格式为，`属性名称`:`数据类型`，使用英文`:`分隔开，中间不能有空格。
+
+在所有的表格中`ID`字段全表唯一，在单独一张表中`VALUE`字段单表唯一。
