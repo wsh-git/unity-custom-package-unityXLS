@@ -39,7 +39,7 @@ namespace Wsh.Xlsx.Editor {
                 AddTab(stringBuilder, ref tabIndex);
                 stringBuilder.Append($"public static class {xlsName}{XlsxDefine.CLASS_SUFFIX} " + "{\n\n");
                 string structName = xlsName + XlsxDefine.STRUCT_SUFFIX;
-                stringBuilder.Append(CreateStruct(xlsName, structName, headInfoDic, ref tabIndex));
+                stringBuilder.Append(CreateStruct(structName, headInfoDic, ref tabIndex));
                 stringBuilder.Append(CreateDictionary(headInfoDic, idInfoDic, worksheet, structName, ref tabIndex));
                 stringBuilder.Append(CreateFunctions(headInfoDic, structName, ref tabIndex));
                 stringBuilder.Append(XlsxDefine.TAB_CHAR_ARRAY[1] + "}\n\n");
@@ -51,7 +51,7 @@ namespace Wsh.Xlsx.Editor {
             }
         }
 
-        private static string CreateStruct(string xlsName, string structName, Dictionary<int, XlsxHeadInfo> headInfoDic, ref int tabIndex) {
+        private static string CreateStruct(string structName, Dictionary<int, XlsxHeadInfo> headInfoDic, ref int tabIndex) {
             StringBuilder stringBuilder = new StringBuilder();
             AddTab(stringBuilder, ref tabIndex);
             stringBuilder.Append($"public struct {structName} " + "{\n");
