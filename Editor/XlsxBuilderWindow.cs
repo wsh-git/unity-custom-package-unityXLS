@@ -26,19 +26,19 @@ namespace Wsh.Xlsx.Editor {
             Instance.Show();
         }
 
-        public string XlsDir => m_xlsDir;
-        public string XlsDataOutputDir => m_xlsDataOutputDir;
+        public string XlsxDir => m_xlsxDir;
+        public string XlsxDataOutputDir => m_xlsxDataOutputDir;
         
-        private string m_xlsDir;
-        private string m_xlsDataOutputDir;
+        private string m_xlsxDir;
+        private string m_xlsxDataOutputDir;
         private XlsxScriptableObjectLoader m_scriptableObjLoader;
         private bool m_isInited;
         
         private void InitMainWindowData() {
             var data = m_scriptableObjLoader.LoadXlsMainScriptableObject();
             if(data != null) {
-                m_xlsDir = data.XlsDir;
-                m_xlsDataOutputDir = data.XlsDataOutputDir;
+                m_xlsxDir = data.XlsxDir;
+                m_xlsxDataOutputDir = data.XlsxDataOutputDir;
                 m_isInited = true;
             }
         }
@@ -60,15 +60,15 @@ namespace Wsh.Xlsx.Editor {
             GUILayout.BeginHorizontal();
             GUILayout.Space(FIRST_SPACE);
             GUILayout.Label("XlsxDir:", GUILayout.Width(100));
-            if(string.IsNullOrEmpty(m_xlsDir)) {
+            if(string.IsNullOrEmpty(m_xlsxDir)) {
                 GUILayout.Label(EMPTY_STRING);
             } else {
-                GUILayout.Label(m_xlsDir);
+                GUILayout.Label(m_xlsxDir);
             }
             if(GUILayout.Button("浏览")) {
                 string path = EditorUtility.OpenFolderPanel("选择项目Xlsx路径", Application.dataPath, "");
                 if(path != null) {
-                    m_xlsDir = path;
+                    m_xlsxDir = path;
                 }
             }
             GUILayout.EndHorizontal();
@@ -78,15 +78,15 @@ namespace Wsh.Xlsx.Editor {
             GUILayout.BeginHorizontal();
             GUILayout.Space(FIRST_SPACE);
             GUILayout.Label("OutputDir:", GUILayout.Width(100));
-            if(string.IsNullOrEmpty(m_xlsDataOutputDir)) {
+            if(string.IsNullOrEmpty(m_xlsxDataOutputDir)) {
                 GUILayout.Label(EMPTY_STRING);
             } else {
-                GUILayout.Label(m_xlsDataOutputDir);
+                GUILayout.Label(m_xlsxDataOutputDir);
             }
             if(GUILayout.Button("浏览")) {
                 string path = EditorUtility.OpenFolderPanel("选择Xlsx数据导出路径", Application.dataPath, "");
                 if(path != null) {
-                    m_xlsDataOutputDir = path;
+                    m_xlsxDataOutputDir = path;
                 }
             }
             GUILayout.EndHorizontal();
@@ -104,12 +104,12 @@ namespace Wsh.Xlsx.Editor {
 
             GUILayout.Space(10);
             if(GUILayout.Button("Build All Xlsx", GUILayout.Height(30))) {
-                XlsxBuilder.BuildFolder(m_xlsDir, m_xlsDataOutputDir);
+                XlsxBuilder.BuildFolder(m_xlsxDir, m_xlsxDataOutputDir);
             }
 
             GUILayout.Space(10);
             if(GUILayout.Button("Clear All Generate", GUILayout.Height(30))) {
-                XlsxBuilder.ClearFolder(m_xlsDataOutputDir);
+                XlsxBuilder.ClearFolder(m_xlsxDataOutputDir);
             }
         }
 

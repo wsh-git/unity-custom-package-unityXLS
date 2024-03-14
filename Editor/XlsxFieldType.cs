@@ -153,7 +153,7 @@ namespace Wsh.Xlsx.Editor {
                     return "false";
                 case LOCAL:
                 case ID:
-                    return XlsxDefine.XLS_NULL_ID.ToString();
+                    return XlsxDefine.XLSX_NULL_ID.ToString();
                 default:
                     return "null";
             }

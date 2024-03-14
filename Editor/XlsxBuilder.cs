@@ -145,9 +145,8 @@ namespace Wsh.Xlsx.Editor {
             }
         }
 
-        public static void BuildFolder(string xlsFolder, string outputFolder) {
-            //XLSBuilder.BuildFile("Test", "D:/Projects/yiyiyaya/Excel/Test.xlsx", "D:/Projects/yiyiyaya/Excel/TestXlsWrapper.cs");
-            DirectoryInfo dir = new DirectoryInfo(xlsFolder);
+        public static void BuildFolder(string xlsxFolder, string outputFolder) {
+            DirectoryInfo dir = new DirectoryInfo(xlsxFolder);
             FileInfo[] fileInfos = dir.GetFiles();
             EditorUtility.DisplayProgressBar("Generate xlsx Csharp file", "start generate...", 0);
             int currentIndex = 0;

@@ -28,7 +28,7 @@ namespace Wsh.Xlsx.Editor {
             stringBuilder.Append(XlsxDefine.TAB_CHAR_ARRAY[tabIndex]);
         }
 
-        public static void Generate(Dictionary<int, XlsxHeadInfo> headInfoDic, Dictionary<int, XlsxIDInfo> idInfoDic, ExcelWorksheet worksheet, string xlsName, string outputFilePath) {
+        public static void Generate(Dictionary<int, XlsxHeadInfo> headInfoDic, Dictionary<int, XlsxIDInfo> idInfoDic, ExcelWorksheet worksheet, string xlsxName, string outputFilePath) {
             try {
                 StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.Append("// Automatically generated. Do not modify it manually!!!\n\n");
@@ -37,15 +37,15 @@ namespace Wsh.Xlsx.Editor {
                 stringBuilder.Append("namespace Wsh.Xlsx {\n\n");
                 int tabIndex = 0;
                 AddTab(stringBuilder, ref tabIndex);
-                stringBuilder.Append($"public static class {xlsName}{XlsxDefine.CLASS_SUFFIX} " + "{\n\n");
-                string structName = xlsName + XlsxDefine.STRUCT_SUFFIX;
+                stringBuilder.Append($"public static class {xlsxName}{XlsxDefine.CLASS_SUFFIX} " + "{\n\n");
+                string structName = xlsxName + XlsxDefine.STRUCT_SUFFIX;
                 stringBuilder.Append(CreateStruct(structName, headInfoDic, ref tabIndex));
                 stringBuilder.Append(CreateDictionary(headInfoDic, idInfoDic, worksheet, structName, ref tabIndex));
                 stringBuilder.Append(CreateFunctions(headInfoDic, structName, ref tabIndex));
                 stringBuilder.Append(XlsxDefine.TAB_CHAR_ARRAY[1] + "}\n\n");
                 stringBuilder.Append("}\n");
                 File.WriteAllText(outputFilePath, stringBuilder.ToString());
-                Log.Info($"{xlsName}{XlsxDefine.CLASS_SUFFIX}.cs generate success.");
+                Log.Info($"{xlsxName}{XlsxDefine.CLASS_SUFFIX}.cs generate success.");
             } catch(Exception e) {
                 throw e;
             }

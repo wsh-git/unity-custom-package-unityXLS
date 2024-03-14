@@ -9,7 +9,7 @@ namespace Wsh.Xlsx.Editor {
 
         private const string SCRIPTABLEOBJECT_FOLDER = "Assets/WshConfig/";
 
-        private const string SCRIPTABLEOBJECT_PATH = SCRIPTABLEOBJECT_FOLDER + "XLSMainWindowScriptableObject.asset";
+        private const string SCRIPTABLEOBJECT_PATH = SCRIPTABLEOBJECT_FOLDER + "XlsxMainWindowScriptableObject.asset";
 
         public XlsxMainScriptableObject LoadXlsMainScriptableObject() {
             XlsxMainScriptableObject scriptableObject = AssetDatabase.LoadAssetAtPath<XlsxMainScriptableObject>(SCRIPTABLEOBJECT_PATH);
@@ -22,8 +22,8 @@ namespace Wsh.Xlsx.Editor {
                 scriptableObject = ScriptableObject.CreateInstance<XlsxMainScriptableObject>();
                 AssetDatabase.CreateAsset(scriptableObject, SCRIPTABLEOBJECT_PATH);
             }
-            scriptableObject.XlsDir = window.XlsDir;
-            scriptableObject.XlsDataOutputDir = window.XlsDataOutputDir;
+            scriptableObject.XlsxDir = window.XlsxDir;
+            scriptableObject.XlsxDataOutputDir = window.XlsxDataOutputDir;
             EditorUtility.SetDirty(scriptableObject);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();

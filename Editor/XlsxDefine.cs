@@ -9,7 +9,7 @@ namespace Wsh.Xlsx.Editor {
         public const string STRUCT_SUFFIX = "XlsxData";
         public const string CLASS_SUFFIX = "XlsxWrapper";
 
-        public const int XLS_NULL_ID = 0;
+        public const int XLSX_NULL_ID = 0;
 
         public readonly static string[] TAB_CHAR_ARRAY = new string[10]{
             "",
