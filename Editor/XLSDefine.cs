@@ -23,5 +23,8 @@ namespace Wsh.XLS.Editor {
             "                                ",
             "                                    ",
         };
+
+        public const string XLS_EXTENSION = ".xls";
+        public const string XLSX_EXTENSION = ".xlsx";
     }
 }

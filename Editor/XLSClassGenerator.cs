@@ -32,7 +32,8 @@ namespace Wsh.XLS.Editor {
             try {
                 StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.Append("// Automatically generated. Do not modify it manually!!!\n\n");
-                stringBuilder.Append("using System.Collections.Generic;\n\n");
+                stringBuilder.AppendLine("using System.Collections.Generic;");
+                stringBuilder.AppendLine("using System.Linq;\n");
                 stringBuilder.Append("namespace Wsh.XLS {\n\n");
                 int tabIndex = 0;
                 AddTab(stringBuilder, ref tabIndex);
