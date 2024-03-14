@@ -1,13 +1,13 @@
-namespace Wsh.XLS.Editor {
+namespace Wsh.Xlsx.Editor {
 
-    public static class XLSDefine {
+    public static class XlsxDefine {
 
         public const string ID_CHAR = "ID";
         public const string VALUE_CHAR = "VALUE";
         public const string NULL_CHAR = "NULL";
 
-        public const string STRUCT_SUFFIX = "XlsData";
-        public const string CLASS_SUFFIX = "XlsWrapper";
+        public const string STRUCT_SUFFIX = "XlsxData";
+        public const string CLASS_SUFFIX = "XlsxWrapper";
 
         public const int XLS_NULL_ID = 0;
 

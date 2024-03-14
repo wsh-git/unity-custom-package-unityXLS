@@ -1,5 +1,5 @@
 {
-    "name": "Wsh.XLS.Editor",
+    "name": "Wsh.Xlsx.Editor",
     "rootNamespace": "",
     "references": [
         "GUID:edaf78f30c77a1c4ca672d7f4accd7f4"

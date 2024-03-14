@@ -1,8 +1,8 @@
 using UnityEngine;
 
-namespace Wsh.XLS.Editor {
+namespace Wsh.Xlsx.Editor {
 
-    public class XLSMainScriptableObject : ScriptableObject {
+    public class XlsxMainScriptableObject : ScriptableObject {
         public string XlsDir = "";
         public string XlsDataOutputDir = "";
     }

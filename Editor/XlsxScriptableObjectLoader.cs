@@ -3,23 +3,23 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace Wsh.XLS.Editor {
+namespace Wsh.Xlsx.Editor {
 
-    public class XLSScriptableObjectLoader {
+    public class XlsxScriptableObjectLoader {
 
         private const string SCRIPTABLEOBJECT_FOLDER = "Assets/WshConfig/";
 
         private const string SCRIPTABLEOBJECT_PATH = SCRIPTABLEOBJECT_FOLDER + "XLSMainWindowScriptableObject.asset";
 
-        public XLSMainScriptableObject LoadXlsMainScriptableObject() {
-            XLSMainScriptableObject scriptableObject = AssetDatabase.LoadAssetAtPath<XLSMainScriptableObject>(SCRIPTABLEOBJECT_PATH);
+        public XlsxMainScriptableObject LoadXlsMainScriptableObject() {
+            XlsxMainScriptableObject scriptableObject = AssetDatabase.LoadAssetAtPath<XlsxMainScriptableObject>(SCRIPTABLEOBJECT_PATH);
             return scriptableObject;
         }
         
-        public void SaveScriptableObject(XLSBuilderWindow window) {
-            XLSMainScriptableObject scriptableObject = AssetDatabase.LoadAssetAtPath<XLSMainScriptableObject>(SCRIPTABLEOBJECT_PATH);
+        public void SaveScriptableObject(XlsxBuilderWindow window) {
+            XlsxMainScriptableObject scriptableObject = AssetDatabase.LoadAssetAtPath<XlsxMainScriptableObject>(SCRIPTABLEOBJECT_PATH);
             if(scriptableObject == null) {
-                scriptableObject = ScriptableObject.CreateInstance<XLSMainScriptableObject>();
+                scriptableObject = ScriptableObject.CreateInstance<XlsxMainScriptableObject>();
                 AssetDatabase.CreateAsset(scriptableObject, SCRIPTABLEOBJECT_PATH);
             }
             scriptableObject.XlsDir = window.XlsDir;
@@ -30,7 +30,7 @@ namespace Wsh.XLS.Editor {
         }
 
         public void CheckScriptableObject() {
-            Type scriptableObj = typeof(XLSMainScriptableObject);
+            Type scriptableObj = typeof(XlsxMainScriptableObject);
             string[] assetPaths = AssetDatabase.FindAssets("t:" + scriptableObj);
             if(assetPaths == null || assetPaths.Length == 0) {
                 TryCreateScriptableObject();
@@ -38,7 +38,7 @@ namespace Wsh.XLS.Editor {
         }
 
         private void TryCreateScriptableObject() {
-            XLSMainScriptableObject scriptableObject = ScriptableObject.CreateInstance<XLSMainScriptableObject>();
+            XlsxMainScriptableObject scriptableObject = ScriptableObject.CreateInstance<XlsxMainScriptableObject>();
             TryCreateFolder();
             AssetDatabase.CreateAsset(scriptableObject, SCRIPTABLEOBJECT_PATH);
             AssetDatabase.SaveAssets();

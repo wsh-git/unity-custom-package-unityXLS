@@ -1,14 +1,14 @@
 {
-  "name": "com.wshunity.xls",
-  "displayName": "Wsh Unity XLS",
+  "name": "com.wshunity.xlsx",
+  "displayName": "Wsh Unity Xlsx",
   "version": "0.0.1",
   "unity": "2017.2",
   "keywords": [
-    "XLS"
+    "Xlsx"
   ],
-  "description": "This is a very simple xls system.",
+  "description": "This is a very simple xlsx system.",
   "repository": {
-    "url": "https://github.com/wsh-git/unity-custom-package-unityXLS.git",
+    "url": "https://github.com/wsh-git/unity-custom-package-unityXlsx.git",
     "type": "git",
     "revision": ""
   },

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 
-namespace Wsh.XLS.Editor {
-    public class XLSFieldType {
+namespace Wsh.Xlsx.Editor {
+    public class XlsxFieldType {
 
         public const string STRING = "string";
         public const string STRING_ARRAY = "string[]";
@@ -153,7 +153,7 @@ namespace Wsh.XLS.Editor {
                     return "false";
                 case LOCAL:
                 case ID:
-                    return XLSDefine.XLS_NULL_ID.ToString();
+                    return XlsxDefine.XLS_NULL_ID.ToString();
                 default:
                     return "null";
             }

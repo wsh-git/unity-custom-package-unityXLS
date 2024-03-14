@@ -4,9 +4,9 @@ using System.IO;
 using OfficeOpenXml;
 using UnityEditor;
 
-namespace Wsh.XLS.Editor {
+namespace Wsh.Xlsx.Editor {
 
-    public class XLSBuilder {
+    public class XlsxBuilder {
 
         private static List<List<object>> GetValues(ExcelWorksheet worksheet, int totalColumnNumber) {
             List<List<object>> list = new List<List<object>>();//按列存储数据
@@ -15,7 +15,7 @@ namespace Wsh.XLS.Editor {
             for(int rowNum = 2; rowNum <= worksheet.Dimension.End.Row; rowNum++) {
                 for(int colNum = 1; colNum <= worksheet.Dimension.End.Column; colNum++) {
                     var data = worksheet.Cells[rowNum, colNum];
-                    object value = XLSDefine.NULL_CHAR;
+                    object value = XlsxDefine.NULL_CHAR;
                     if(data.Value != null) {
                         value = data.Value;
                     }
@@ -27,49 +27,49 @@ namespace Wsh.XLS.Editor {
             return list;
         }
 
-        private static Dictionary<int, XLSHeadInfo> GetHeadInfoDic(ExcelWorksheet worksheet, ref int idColIndex, ref int valueColIndex) {
+        private static Dictionary<int, XlsxHeadInfo> GetHeadInfoDic(ExcelWorksheet worksheet, ref int idColIndex, ref int valueColIndex) {
             //以列为key
-            Dictionary<int, XLSHeadInfo> headInfoDic = new Dictionary<int, XLSHeadInfo>();
+            Dictionary<int, XlsxHeadInfo> headInfoDic = new Dictionary<int, XlsxHeadInfo>();
             //以名称为key
             Dictionary<string, int> nameDic = new Dictionary<string, int>();
             // 读取列名，
             for(int i = 1; i <= worksheet.Dimension.End.Column; i++) {
                 string headText = worksheet.Cells[1, i].Value.ToString();
                 string[] headData = headText.Split(':');
-                if(headData[0] == XLSDefine.ID_CHAR) {
+                if(headData[0] == XlsxDefine.ID_CHAR) {
                     idColIndex = i;
                     nameDic.Add(headData[0], 1);
-                    headInfoDic.Add(i, new XLSHeadInfo(i, headData[0], XLSFieldType.STRING));
-                } else if(headData[0] == XLSDefine.VALUE_CHAR) {
+                    headInfoDic.Add(i, new XlsxHeadInfo(i, headData[0], XlsxFieldType.STRING));
+                } else if(headData[0] == XlsxDefine.VALUE_CHAR) {
                     valueColIndex = i;
                     nameDic.Add(headData[0], 1);
-                    headInfoDic.Add(i, new XLSHeadInfo(i, headData[0], XLSFieldType.INT));
+                    headInfoDic.Add(i, new XlsxHeadInfo(i, headData[0], XlsxFieldType.INT));
                 } else {
                     if(headData.Length < 2) {
                         throw new Exception($"' {headData[0]} ' no value-type in (1, {i}).");
                     }
-                    if(!XLSFieldType.Contain(headData[1])) {
-                        throw new Exception($"' {headText} ' no define value-type in (1, {i}). {XLSFieldType.GetAllDefineType()}");
+                    if(!XlsxFieldType.Contain(headData[1])) {
+                        throw new Exception($"' {headText} ' no define value-type in (1, {i}). {XlsxFieldType.GetAllDefineType()}");
                     }
                     if(nameDic.ContainsKey(headData[0])) {
                         throw new Exception($"' {headText} ' exist same name in (1, {i}).");
                     }
                     nameDic.Add(headData[0], 1);
-                    headInfoDic.Add(i, new XLSHeadInfo(i, headData[0], headData[1]));
+                    headInfoDic.Add(i, new XlsxHeadInfo(i, headData[0], headData[1]));
                 }
             }
-            if(!nameDic.ContainsKey(XLSDefine.ID_CHAR)) {
-                throw new Exception($"Do not define ' {XLSDefine.ID_CHAR} '.");
+            if(!nameDic.ContainsKey(XlsxDefine.ID_CHAR)) {
+                throw new Exception($"Do not define ' {XlsxDefine.ID_CHAR} '.");
             }
-            if(!nameDic.ContainsKey(XLSDefine.VALUE_CHAR)) {
-                throw new Exception($"Do not define ' {XLSDefine.VALUE_CHAR} '.");
+            if(!nameDic.ContainsKey(XlsxDefine.VALUE_CHAR)) {
+                throw new Exception($"Do not define ' {XlsxDefine.VALUE_CHAR} '.");
             }
             return headInfoDic;
         }
 
-        private static Dictionary<int, XLSIDInfo> GetIDInfoDic(ExcelWorksheet worksheet, int idColIndex, int valueColIndex) {
+        private static Dictionary<int, XlsxIDInfo> GetIDInfoDic(ExcelWorksheet worksheet, int idColIndex, int valueColIndex) {
             //以 VALUE(int) 为key
-            Dictionary<int, XLSIDInfo> idInfoDic = new Dictionary<int, XLSIDInfo>();
+            Dictionary<int, XlsxIDInfo> idInfoDic = new Dictionary<int, XlsxIDInfo>();
             //以 ID(string) 为key
             Dictionary<string, int> idDic = new Dictionary<string, int>();
             int idHeight = 0;
@@ -79,26 +79,26 @@ namespace Wsh.XLS.Editor {
                 var valueCellData = worksheet.Cells[rowNum, valueColIndex];
                 if(idCellData.Value != null) {
                     if(valueCellData.Value == null) {
-                        throw new Exception($"' {idCellData.Value} ' do not define ' {XLSDefine.VALUE_CHAR} '.");
+                        throw new Exception($"' {idCellData.Value} ' do not define ' {XlsxDefine.VALUE_CHAR} '.");
                     }
                     string id = idCellData.Value.ToString();
                     int value = 0;
                     int.TryParse(valueCellData.Value.ToString(), out value);
                     if(value == 0) {
-                        throw new Exception($"' {idCellData.Value} '  -- ' {XLSDefine.VALUE_CHAR} ' must be ' int '.");
+                        throw new Exception($"' {idCellData.Value} '  -- ' {XlsxDefine.VALUE_CHAR} ' must be ' int '.");
                     }
                     if(lastVauleId != 0) {
                         idInfoDic[lastVauleId].SetHeight(idHeight);
                     }
                     idHeight = 1;
                     if(idInfoDic.ContainsKey(value)) {
-                        throw new Exception($"' {idCellData.Value} '  -- ' {XLSDefine.VALUE_CHAR} ' exist same value.");
+                        throw new Exception($"' {idCellData.Value} '  -- ' {XlsxDefine.VALUE_CHAR} ' exist same value.");
                     }
                     if(idDic.ContainsKey(id)) {
                         throw new Exception($"' {idCellData.Value} ' exist same id.");
                     }
                     idDic.Add(id, 1);
-                    idInfoDic.Add(value, new XLSIDInfo(id, value, rowNum));
+                    idInfoDic.Add(value, new XlsxIDInfo(id, value, rowNum));
                     lastVauleId = value;
                 } else {
                     idHeight++;
@@ -115,8 +115,8 @@ namespace Wsh.XLS.Editor {
                 using(var package = new ExcelPackage(fs)) {
                     // 获取第一个工作表
                     var worksheet = package.Workbook.Worksheets[0];
-                    Dictionary<int, XLSHeadInfo> headInfoDic;
-                    Dictionary<int, XLSIDInfo> idInfoDic;
+                    Dictionary<int, XlsxHeadInfo> headInfoDic;
+                    Dictionary<int, XlsxIDInfo> idInfoDic;
                     int idColIndex = 0;
                     int valueColIndex = 0;
 
@@ -136,7 +136,7 @@ namespace Wsh.XLS.Editor {
                     }
 
                     try {
-                        XLSClassGenerator.Generate(headInfoDic, idInfoDic, worksheet, fileName, outputFilePath);
+                        XlsxClassGenerator.Generate(headInfoDic, idInfoDic, worksheet, fileName, outputFilePath);
                     } catch(Exception e) {
                         throw new Exception(e.Message + " from " + filePath);
                     }
@@ -160,14 +160,14 @@ namespace Wsh.XLS.Editor {
                     //Log.Info(filePath, fileName, extension);
                     currentIndex++;
                     EditorUtility.DisplayProgressBar("Generate xlsx Csharp file", "generate " + fileInfo.Name, currentIndex / totalNumber);
-                    if(extension != XLSDefine.XLSX_EXTENSION) {
+                    if(extension != XlsxDefine.XLSX_EXTENSION) {
                         continue;
                     }
-                    if(extension == XLSDefine.XLS_EXTENSION) {
+                    if(extension == XlsxDefine.XLS_EXTENSION) {
                         Log.Error("Dont support '.xls'. Please use '.xlsx'");
                         continue;
                     }
-                    BuildFile(fileName, filePath, Path.Combine(outputFolder, fileName + XLSDefine.CLASS_SUFFIX + ".cs"));
+                    BuildFile(fileName, filePath, Path.Combine(outputFolder, fileName + XlsxDefine.CLASS_SUFFIX + ".cs"));
                 }
                 EditorUtility.ClearProgressBar();
                 EditorUtility.DisplayDialog("Generate xlsx", "Generate Success", "Ok");
