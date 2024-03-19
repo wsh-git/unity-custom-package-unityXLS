@@ -63,6 +63,7 @@ namespace Wsh.Xlsx.Editor {
             SubTab(stringBuilder, ref tabIndex);
             stringBuilder.AppendLine("}");
             stringBuilder.AppendLine("}");
+            
             //File.WriteAllText(outputFilePath, stringBuilder.ToString());
             SaveCsharpScript(outputFilePath, stringBuilder.ToString());
             Log.Info($"{outputFilePath} generate success.");
@@ -84,6 +85,7 @@ namespace Wsh.Xlsx.Editor {
                 stringBuilder.Append(CreateFunctions(xlsxGenerateData.HeadInfoDic, structName, ref tabIndex));
                 stringBuilder.Append(XlsxDefine.TAB_CHAR_ARRAY[1] + "}\n\n");
                 stringBuilder.Append("}\n");
+                
                 //File.WriteAllText(xlsxGenerateData.OutputFilePath, stringBuilder.ToString());
                 SaveCsharpScript(xlsxGenerateData.OutputFilePath, stringBuilder.ToString());
                 Log.Info($"{xlsxGenerateData.XlsxName}{XlsxDefine.CLASS_SUFFIX}.cs generate success.");
@@ -171,6 +173,18 @@ namespace Wsh.Xlsx.Editor {
                         return TryConvertBooleanArray(idInfo.RowIndex, headInfo.Index, content, idInfo.Height, ref tabIndex);
                     case XlsxFieldType.BOOLEAN_2D_ARRAY:
                         return TryConvertBoolean2DArray(idInfo.RowIndex, headInfo.Index, content, idInfo.Height, ref tabIndex);
+                    case XlsxFieldType.ID:
+                        return TryConvertXlsxId(obj);
+                    case XlsxFieldType.ID_ARRAY:
+                        return TryConvertXlsxIdArray(idInfo.RowIndex, headInfo.Index, content, idInfo.Height, ref tabIndex);
+                    case XlsxFieldType.ID_2D_ARRAY:
+                        return TryConvertXlsxId2DArray(idInfo.RowIndex, headInfo.Index, content, idInfo.Height, ref tabIndex);
+                    case XlsxFieldType.LOCAL:
+                        return TryConvertLocalId(obj);
+                    case XlsxFieldType.LOCAL_ARRAY:
+                        return TryConvertLocalIdArray(idInfo.RowIndex, headInfo.Index, content, idInfo.Height, ref tabIndex);
+                    case XlsxFieldType.LOCAL_2D_ARRAY:
+                        return TryConvertLocalId2DArray(idInfo.RowIndex, headInfo.Index, content, idInfo.Height, ref tabIndex);
                 }
                 return "null";
             } catch(Exception e) {
@@ -200,6 +214,14 @@ namespace Wsh.Xlsx.Editor {
 
         private static string TryConvertBooleanArray(int rowIndex, int colIndex, object[,] content, int maxHeight, ref int tabIndex) {
             return TryConvertArray(rowIndex, colIndex, content, maxHeight, XlsxFieldType.BOOLEAN_ARRAY, ref tabIndex, TryConvertBoolean);
+        }
+
+        private static string TryConvertXlsxIdArray(int rowIndex, int colIndex, object[,] content, int maxHeight, ref int tabIndex) {
+            return TryConvertArray(rowIndex, colIndex, content, maxHeight, XlsxFieldType.INT_ARRAY, ref tabIndex, TryConvertXlsxId);
+        }
+
+        private static string TryConvertLocalIdArray(int rowIndex, int colIndex, object[,] content, int maxHeight, ref int tabIndex) {
+            return TryConvertArray(rowIndex, colIndex, content, maxHeight, XlsxFieldType.INT_ARRAY, ref tabIndex, TryConvertLocalId);
         }
 
         private static string TryConvertArray(int rowIndex, int colIndex, object[,] content, int maxHeight, string valueType, ref int tabIndex, Func<object, string> tryConvertHandler) {
@@ -248,6 +270,14 @@ namespace Wsh.Xlsx.Editor {
             return TryConvert2DArray(rowIndex, colIndex, content, maxHeight, XlsxFieldType.BOOLEAN, ref tabIndex, TryConvertBoolean);
         }
         
+        private static string TryConvertXlsxId2DArray(int rowIndex, int colIndex, object[,] content, int maxHeight, ref int tabIndex) {
+            return TryConvert2DArray(rowIndex, colIndex, content, maxHeight, XlsxFieldType.BOOLEAN, ref tabIndex, TryConvertXlsxId);
+        }
+        
+        private static string TryConvertLocalId2DArray(int rowIndex, int colIndex, object[,] content, int maxHeight, ref int tabIndex) {
+            return TryConvert2DArray(rowIndex, colIndex, content, maxHeight, XlsxFieldType.BOOLEAN, ref tabIndex, TryConvertLocalId);
+        }
+
         private static string TryConvert2DArray(int rowIndex, int colIndex, object[,] content, int maxHeight, string valueType, ref int tabIndex, Func<object, string> tryConvertHandler) {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.AppendLine($"new {valueType}[][] " + "{");
@@ -342,6 +372,26 @@ namespace Wsh.Xlsx.Editor {
             } else {
                 return "\"" + obj.ToString() + "\"";
             }
+        }
+
+        private static string TryConvertXlsxId(object obj) {
+            string result = XlsxDefine.XLSX_ID_CLASS_NAME + ".";
+            if(obj != null) {
+                result += obj.ToString();
+            } else {
+                result += XlsxDefine.NONE;
+            }
+            return result;
+        }
+
+        private static string TryConvertLocalId(object obj) {
+            string result = XlsxDefine.LOCAL_ID_CLASS_NAME + ".";
+            if(obj != null) {
+                result += obj.ToString();
+            } else {
+                result += XlsxDefine.NONE;
+            }
+            return result;
         }
 
         private static string CreateFunctions(Dictionary<int, XlsxHeadInfo> headInfoDic, string structName, ref int tabIndex) {

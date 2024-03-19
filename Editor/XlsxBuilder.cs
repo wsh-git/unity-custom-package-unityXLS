@@ -52,6 +52,7 @@ namespace Wsh.Xlsx.Editor {
             int currentIndex = 0;
             float totalNumber = fileInfos.Length;
             Dictionary<string, int> idDic = new Dictionary<string, int>();
+            idDic.Add(XlsxDefine.NONE, 0);
             try {
                 foreach(System.IO.FileInfo fileInfo in fileInfos) {
                     string filePath = fileInfo.FullName;
