@@ -62,8 +62,7 @@ namespace Wsh.Xlsx.Editor {
             }
             SubTab(stringBuilder, ref tabIndex);
             stringBuilder.AppendLine("}");
-            stringBuilder.AppendLine("}");
-            
+            stringBuilder.AppendLine("}");            
             //File.WriteAllText(outputFilePath, stringBuilder.ToString());
             SaveCsharpScript(outputFilePath, stringBuilder.ToString());
             Log.Info($"{outputFilePath} generate success.");
@@ -81,6 +80,7 @@ namespace Wsh.Xlsx.Editor {
                 stringBuilder.Append($"public static class {xlsxGenerateData.XlsxName}{XlsxDefine.CLASS_SUFFIX} " + "{\n\n");
                 string structName = xlsxGenerateData.XlsxName + XlsxDefine.STRUCT_SUFFIX;
                 stringBuilder.Append(CreateStruct(structName, xlsxGenerateData.HeadInfoDic, ref tabIndex));
+                stringBuilder.Append(CreateIdDictionary(xlsxGenerateData, ref tabIndex));
                 stringBuilder.Append(CreateDictionary(xlsxGenerateData, structName, ref tabIndex));
                 stringBuilder.Append(CreateFunctions(xlsxGenerateData.HeadInfoDic, structName, ref tabIndex));
                 stringBuilder.Append(XlsxDefine.TAB_CHAR_ARRAY[1] + "}\n\n");
@@ -106,6 +106,24 @@ namespace Wsh.Xlsx.Editor {
             SubTab(stringBuilder, ref tabIndex);
             stringBuilder.Append("}\n\n");
             return stringBuilder.ToString();
+        }
+        
+        private static string CreateIdDictionary(XlsxGenerateData xlsxGenerateData, ref int tabIndex) {
+            try {
+                StringBuilder stringBuilder = new StringBuilder();
+                KeepTap(stringBuilder, ref tabIndex);
+                stringBuilder.AppendLine("private readonly static Dictionary<string, int> m_idDic = new Dictionary<string, int> {");
+                tabIndex++;
+                foreach(var value in xlsxGenerateData.IdInfoDic.Values) {
+                    KeepTap(stringBuilder, ref tabIndex);
+                    stringBuilder.AppendLine("{" + $" \"{value.Id}\", {value.Value} " + "},");
+                }
+                SubTab(stringBuilder,ref tabIndex);
+                stringBuilder.AppendLine("};\n");
+                return stringBuilder.ToString();
+            } catch(Exception e) {
+                throw e;
+            }
         }
 
         private static string CreateDictionary(XlsxGenerateData xlsxGenerateData, string structName, ref int tabIndex) {
@@ -409,6 +427,32 @@ namespace Wsh.Xlsx.Editor {
             AddTab(stringBuilder, ref tabIndex);
             stringBuilder.AppendLine("return m_dic.ContainsKey(id);");
             SubTab(stringBuilder,ref tabIndex);
+            stringBuilder.AppendLine("}\n");
+
+            KeepTap(stringBuilder, ref tabIndex);
+            stringBuilder.AppendLine("public static int GetId(string idString) {");
+            AddTab(stringBuilder, ref tabIndex);
+            stringBuilder.AppendLine("if(m_idDic.ContainsKey(idString)) {");
+            AddTab(stringBuilder, ref tabIndex);
+            stringBuilder.AppendLine("return m_idDic[idString];");
+            SubTab(stringBuilder, ref tabIndex);
+            stringBuilder.AppendLine("}");
+            KeepTap(stringBuilder, ref tabIndex);
+            stringBuilder.AppendLine("return 0;");
+            SubTab(stringBuilder, ref tabIndex);
+            stringBuilder.AppendLine("}\n");
+
+            KeepTap(stringBuilder, ref tabIndex);
+            stringBuilder.AppendLine($"public static {structName} GetData(int id) " + "{");
+            AddTab(stringBuilder, ref tabIndex);
+            stringBuilder.AppendLine("if(Contain(id)) {");
+            AddTab(stringBuilder, ref tabIndex);
+            stringBuilder.AppendLine("return m_dic[id];");
+            SubTab(stringBuilder, ref tabIndex);
+            stringBuilder.AppendLine("}");
+            KeepTap(stringBuilder, ref tabIndex);
+            stringBuilder.AppendLine($"return default({structName});");
+            SubTab(stringBuilder, ref tabIndex);
             stringBuilder.AppendLine("}\n");
 
             foreach(var headInfo in headInfoDic.Values) {
