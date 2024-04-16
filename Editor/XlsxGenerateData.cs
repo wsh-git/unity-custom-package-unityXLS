@@ -112,7 +112,7 @@ namespace Wsh.Xlsx.Editor {
                         throw new Exception($"' {idCellData.Value} ' exist same id.");
                     }
                     idDic.Add(id, 1);
-                    m_idInfoDic.Add(value, new XlsxIDInfo(id, value, rowNum));
+                    m_idInfoDic.Add(value, new XlsxIDInfo(id, value, rowNum, idHeight));
                     lastVauleId = value;
                 } else {
                     idHeight++;

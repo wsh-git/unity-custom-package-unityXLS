@@ -13,10 +13,11 @@
         private int m_height; //在xlsx中，一个 id 下的属性内容最长有多少行，特别是有数组的情况下，没有数组的情况下一般为 1 行；
 
 
-        public XlsxIDInfo(string id, int value, int rowIndex) {
+        public XlsxIDInfo(string id, int value, int rowIndex, int height) {
             m_id = id;
             m_value = value;
             m_rowIndex = rowIndex;
+            m_height = height;
         }
 
         public void SetHeight(int height) {
