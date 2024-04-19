@@ -52,27 +52,29 @@ namespace Wsh.Xlsx.Editor {
             // 读取列名，
             for(int i = 1; i <= worksheet.Dimension.End.Column; i++) {
                 string headText = worksheet.Cells[1, i].Value.ToString();
-                string[] headData = headText.Split(':');
-                if(headData[0] == XlsxDefine.ID_CHAR) {
-                    idColIndex = i;
-                    nameDic.Add(headData[0], 1);
-                    m_headInfoDic.Add(i, new XlsxHeadInfo(i, headData[0], XlsxFieldType.STRING));
-                } else if(headData[0] == XlsxDefine.VALUE_CHAR) {
-                    valueColIndex = i;
-                    nameDic.Add(headData[0], 1);
-                    m_headInfoDic.Add(i, new XlsxHeadInfo(i, headData[0], XlsxFieldType.INT));
-                } else {
-                    if(headData.Length < 2) {
-                        throw new Exception($"' {headData[0]} ' no value-type in (1, {i}).");
+                if(!headText.StartsWith("#")) {
+                    string[] headData = headText.Split(':');
+                    if(headData[0] == XlsxDefine.ID_CHAR) {
+                        idColIndex = i;
+                        nameDic.Add(headData[0], 1);
+                        m_headInfoDic.Add(i, new XlsxHeadInfo(i, headData[0], XlsxFieldType.STRING));
+                    } else if(headData[0] == XlsxDefine.VALUE_CHAR) {
+                        valueColIndex = i;
+                        nameDic.Add(headData[0], 1);
+                        m_headInfoDic.Add(i, new XlsxHeadInfo(i, headData[0], XlsxFieldType.INT));
+                    } else {
+                        if(headData.Length < 2) {
+                            throw new Exception($"' {headData[0]} ' no value-type in (1, {i}).");
+                        }
+                        if(!XlsxFieldType.Contain(headData[1])) {
+                            throw new Exception($"' {headText} ' no define value-type in (1, {i}). {XlsxFieldType.GetAllDefineType()}");
+                        }
+                        if(nameDic.ContainsKey(headData[0])) {
+                            throw new Exception($"' {headText} ' exist same name in (1, {i}).");
+                        }
+                        nameDic.Add(headData[0], 1);
+                        m_headInfoDic.Add(i, new XlsxHeadInfo(i, headData[0], headData[1]));
                     }
-                    if(!XlsxFieldType.Contain(headData[1])) {
-                        throw new Exception($"' {headText} ' no define value-type in (1, {i}). {XlsxFieldType.GetAllDefineType()}");
-                    }
-                    if(nameDic.ContainsKey(headData[0])) {
-                        throw new Exception($"' {headText} ' exist same name in (1, {i}).");
-                    }
-                    nameDic.Add(headData[0], 1);
-                    m_headInfoDic.Add(i, new XlsxHeadInfo(i, headData[0], headData[1]));
                 }
             }
             if(!nameDic.ContainsKey(XlsxDefine.ID_CHAR)) {
@@ -125,7 +127,7 @@ namespace Wsh.Xlsx.Editor {
 
         public Dictionary<string, int> GetIds() {
             Dictionary<string, int> dic = new Dictionary<string, int>();
-            foreach(var value in  m_idInfoDic.Values) {
+            foreach(var value in m_idInfoDic.Values) {
                 dic.Add(value.Id, value.Value);
             }
             return dic;
